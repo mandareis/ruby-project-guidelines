@@ -1,3 +1,5 @@
+require 'pry'
+
 class CLI
   def initialize
     # Bet.destroy_all
@@ -9,7 +11,26 @@ class CLI
   def main_menu
     if @better == nil
       puts ""
-      puts "Welcome to Coinz!"
+      puts "   
+      __      __          ___                                             __              
+      /\ \  __/\ \        /\_ \                                           /\ \__           
+      \ \ \/\ \ \ \     __\//\ \      ___     ___     ___ ___       __    \ \ ,_\    ___   
+       \ \ \ \ \ \ \  /'__`\\ \ \    /'___\  / __`\ /' __` __`\   /'__`\   \ \ \/   / __`\ 
+        \ \ \_/ \_\ \/\  __/ \_\ \_ /\ \__/ /\ \L\ \/\ \/\ \/\ \ /\  __/    \ \ \_ /\ \L\ \
+         \ `\___x___/\ \____\/\____\\ \____\\ \____/\ \_\ \_\ \_\\ \____\    \ \__\\ \____/
+          '\/__//__/  \/____/\/____/ \/____/ \/___/  \/_/\/_/\/_/ \/____/     \/__/ \/___/ 
+                                                                                           
+                                                                                           
+                     ____                           __               __      
+                    /\  _`\            __          /\ \             /\ \__   
+                    \ \ \/\_\    ___  /\_\     ___ \ \ \____     __ \ \ ,_\  
+                     \ \ \/_/_  / __`\\/\ \  /' _ `\\ \ '__`\  /'__`\\ \ \/  
+                      \ \ \L\ \/\ \L\ \\ \ \ /\ \/\ \\ \ \L\ \/\  __/ \ \ \_ 
+                       \ \____/\ \____/ \ \_\\ \_\ \_\\ \_,__/\ \____\ \ \__\
+                        \/___/  \/___/   \/_/ \/_/\/_/ \/___/  \/____/  \/__/
+                                                                             
+                                                                             
+"
       puts ""
       puts "What is your name?"
       divider
@@ -19,18 +40,26 @@ class CLI
     divider
     puts "Hi, #{@better.username}!"
     divider
-    puts "This game has 5/5 stars on the App Store!"
+    puts "Main Menu:"
     puts "You pick what to do next:"
     divider
     puts "1. Change username"
     puts "2. Check point balance"
     puts "3. Play a game"
+    puts "4. Quit"
+    divider
     option_picked = get_user_response
     if option_picked == "1"
       change_username
     elsif option_picked == "2"
       check_points_balance
     elsif option_picked == "3"
+      play_game
+    elsif option_picked == "4"
+      divider 
+      puts "I hope you had fun! We'll miss you"
+      divider
+      exit
     end
   end
 
@@ -54,7 +83,7 @@ class CLI
 
   def divider
     puts ""
-    puts "*" * 30
+    puts "<>" * 15
     puts ""
   end
 
@@ -67,7 +96,62 @@ class CLI
     return self.main_menu
   end
 
+  def play_game
+    new_game = Game.create
+    game_result = new_game.result
+    new_game.outcome = game_result
+    new_game.save
+    divider
+    puts "How much would you like to bet?"
+    bet_amount = get_user_response.to_i
+    new_bet = Bet.create(points_amount: bet_amount, better_id: @better.id, game_id: new_game.id)
+    new_bet.points_amount = bet_amount
+    divider
+    puts "Heads or Tails?"
+    user_guess = get_user_response
+    divider
+    puts "Flipping the coin!"
+    divider
+    sleep(2)
+    if user_guess == game_result
+      @better.points_balance += bet_amount
+      @better.save
+      sleep(2)
+      divider
+      puts "CONGRATULATIONS YOU WIN!!"
+      
+    else 
+      @better.points_balance -= bet_amount
+      @better.save
+      sleep(2)
+      puts "try again, nerd"
+    end
+    divider
+    bet_again
+  end 
+
+  def bet_again
+    puts "Would you like to place another bet?"
+    puts "Y/N"
+    option_picked = get_user_response
+    if option_picked == "y"
+      play_game
+    elsif option_picked =="n"
+      return self.main_menu
+    elsif option_picked == 'exit'
+      #quits the app
+    else
+      puts "Did not understand answer, please type Y or N"
+      bet_again
+    end 
+  end 
+
+
+
+
+
   def get_user_response
     gets.strip.downcase
   end
 end
+
