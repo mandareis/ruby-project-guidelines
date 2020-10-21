@@ -10,24 +10,24 @@ class CLI
 
   def main_menu
     if @better == nil
-      puts ""
+      divider
       puts "Welcome to Coinz!"
       puts ""
       puts "What is your name?"
-      divider
       name = get_user_response
       @better = create_better(name)
     end
     divider
     puts "Hi, #{@better.username}!"
     divider
-    puts "Main Menu:"
+    puts "I am the Main Menu!"
     puts "You pick what to do next:"
     divider
     puts "1. Change username"
     puts "2. Check point balance"
     puts "3. Play a game"
-    puts "4. Quit"
+    puts "4. Checkout"
+    puts "5. Quit"
     divider
     option_picked = get_user_response
     if option_picked == "1"
@@ -37,6 +37,8 @@ class CLI
     elsif option_picked == "3"
       play_game
     elsif option_picked == "4"
+      delete_better
+    elsif option_picked == "5"
       divider 
       puts "I hope you had fun! We'll miss you"
       divider
@@ -45,8 +47,8 @@ class CLI
   end
 
   def create_better(name)
-    new_better = Better.new(username: name, points_balance: 10_000)
-    new_better.save
+    new_better = Better.create(username: name, points_balance: 10_000)
+    #new_better.save
     new_better
   end
 
@@ -83,7 +85,7 @@ class CLI
     new_game.outcome = game_result
     new_game.save
     divider
-    puts "How much would you like to bet?"
+    puts "How much would you like to bet? You have #{@better.points_balance} points left"
     bet_amount = get_user_response.to_i
     new_bet = Bet.create(points_amount: bet_amount, better_id: @better.id, game_id: new_game.id)
     new_bet.points_amount = bet_amount
@@ -97,16 +99,17 @@ class CLI
     if user_guess == game_result
       @better.points_balance += bet_amount
       @better.save
-      sleep(2)
+      sleep(1)
       divider
       puts "CONGRATULATIONS YOU WIN!!"
       
     else 
       @better.points_balance -= bet_amount
       @better.save
-      sleep(2)
-      puts "try again, nerd"
+      sleep(1)
+      puts "You have guessed unwisely! try again, nerd"
     end
+    sleep(3)
     divider
     bet_again
   end 
@@ -120,14 +123,32 @@ class CLI
     elsif option_picked =="n"
       return self.main_menu
     elsif option_picked == 'exit'
-      #quits the app
+      exit
     else
       puts "Did not understand answer, please type Y or N"
       bet_again
     end 
   end 
 
-
+  def delete_better
+    divider
+    puts "Are you sure? You won't be able to play anymore"
+    puts "Y/N"
+    option_picked = get_user_response
+    if option_picked == "y"
+      divider
+      puts "Goodbye #{@better.username.capitalize}! Don't go spending all those points in one place!"
+      divider
+      Better.delete(@better.id)
+    elsif option_picked == "n"
+      return self.main_menu
+    else 
+      puts "Did not understand answer, please try again"
+      divider 
+      sleep(1)
+      delete_better
+    end
+  end 
 
 
 
@@ -135,4 +156,3 @@ class CLI
     gets.strip.downcase
   end
 end
-
