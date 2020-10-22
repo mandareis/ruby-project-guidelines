@@ -210,7 +210,6 @@ class CLI
       sleep(1)
   end
 
-
   def get_user_response
     gets.strip.downcase
   end
