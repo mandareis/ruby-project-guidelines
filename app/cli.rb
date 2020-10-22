@@ -79,14 +79,50 @@ class CLI
     return self.main_menu
   end
 
-  def play_game
+  # def play_game
+  #   new_game = Game.create
+  #   game_result = new_game.result
+  #   new_game.outcome = game_result
+  #   new_game.save
+  #   divider
+  #   puts "How much would you like to bet? You have #{@better.points_balance} points left"
+  #   bet_amount = get_user_response.to_i
+  #   new_bet = Bet.create(points_amount: bet_amount, better_id: @better.id, game_id: new_game.id)
+  #   new_bet.points_amount = bet_amount
+  #   divider
+  #   puts "Heads or Tails?"
+  #   user_guess = get_user_response
+  #   divider
+  #   puts "Flipping the coin!"
+  #   divider
+  #   sleep(2)
+  #   if user_guess == game_result
+  #     @better.points_balance += bet_amount
+  #     @better.save
+  #     sleep(1)
+  #     divider
+  #     puts "CONGRATULATIONS YOU WIN!!"
+  #   else 
+  #     @better.points_balance -= bet_amount
+  #     @better.save
+  #     sleep(1)
+  #     puts "You have guessed unwisely! try again, nerd"
+  #   end
+  #   sleep(3)
+  #   divider
+  #   bet_again
+  # end 
+
+  def play_game(bet_amount=nil)
     new_game = Game.create
     game_result = new_game.result
     new_game.outcome = game_result
     new_game.save
     divider
-    puts "How much would you like to bet? You have #{@better.points_balance} points left"
-    bet_amount = get_user_response.to_i
+    if bet_amount == nil
+      puts "How much would you like to bet? You have #{@better.points_balance} points left"
+      bet_amount = get_user_response.to_i
+    end 
     new_bet = Bet.create(points_amount: bet_amount, better_id: @better.id, game_id: new_game.id)
     new_bet.points_amount = bet_amount
     divider
@@ -102,7 +138,6 @@ class CLI
       sleep(1)
       divider
       puts "CONGRATULATIONS YOU WIN!!"
-      
     else 
       @better.points_balance -= bet_amount
       @better.save
@@ -111,7 +146,7 @@ class CLI
     end
     sleep(3)
     divider
-    bet_again
+    double_or_nothing
   end 
 
   def bet_again
@@ -149,6 +184,18 @@ class CLI
       delete_better
     end
   end 
+
+  def double_or_nothing
+    puts "Double or nothing?"
+    puts "1. Hell yeah"
+    puts "2. Naw I'm good"
+    option_picked = get_user_response
+    if option_picked == "1"
+      play_game((Bet.last.points_amount) * 2)
+    elsif option_picked == "2"
+      bet_again
+    end
+  end
 
 
 
