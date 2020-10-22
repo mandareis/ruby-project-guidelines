@@ -1,6 +1,6 @@
 # COIN COLLECTOR
 
-#### Coin Collect is an fun game that allows you to bet in a game of heads or tails, and if you are feeling lucky you can bet double or nothing.
+#### Coin Collect is an fun game that allows you to bet in a game of heads or tails.
 
 ## INSTRUCTIONS
 
