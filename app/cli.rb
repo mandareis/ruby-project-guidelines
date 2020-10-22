@@ -7,6 +7,8 @@ class CLI
     # Game.destroy_all
     @better = nil
     @bet_amount = nil
+    @game_result = nil
+    @new_game = nil
   end
 
   def main_menu
@@ -21,15 +23,14 @@ class CLI
     end
     divider
     puts "Hi, #{@better.username.capitalize}!"
-    # divider
-    # puts "I am the Main Menu!"
     puts "You pick what to do next:"
     divider
     puts "1. Change username"
     puts "2. Check coin balance"
     puts "3. Play a game"
-    puts "4. Checkout"
-    puts "5. Quit"
+    puts "4. Scrounge for points"
+    puts "5. Checkout"
+    puts "6. Quit"
     divider
     option_picked = get_user_response
     if option_picked == "1"
@@ -39,8 +40,10 @@ class CLI
     elsif option_picked == "3"
       play_game
     elsif option_picked == "4"
-      delete_better
+      scrounge_for_points
     elsif option_picked == "5"
+      delete_better
+    elsif option_picked == "6"
       divider 
       puts "I hope you had fun! We'll miss you"
       divider
@@ -77,66 +80,28 @@ class CLI
   def check_points_balance
     puts "Your current coin-count is #{@better.points_balance} coins."
     sleep(1.5)
-    puts "Enter anything to return to the main menu"
-    if get_user_response
-    return self.main_menu
-    end 
+    wait_for_user_to_read
   end
 
-  def play_game(bet_amount)
-    new_game = Game.create
-    game_result = new_game.result
-    new_game.outcome = game_result
-    new_game.save
-    divider 
-    if bet_amount == nil
-      if @better.points_balance == 1 
-        puts "How much would you like to bet? You have 1 coin left"
-        bet_amount = get_user_response.to_i
-        if bet_amount > @better.points_balance
-          over_bet 
+  def play_game
+    if @better.points_balance == 0
+      puts "You're out of coins! Oh no!"
+      divider
+      sleep(2)
+      return self.main_menu
+
+    else
+      make_game
+      divider 
+      puts "How much would you like to bet? You have #{@better.points_balance} coins left"
+        comparer = get_user_response 
+        if comparer.to_i > @better.points_balance.to_i
+          overbet
+        else @bet_amount = comparer.to_i
         end
-      elsif @better.points_balance == 0
-        puts "You're out of coins! Oh no!"
-        divider
-        sleep(2)
-        return self.main_menu
-      else
-        puts "How much would you like to bet? You have #{@better.points_balance} coins left"
-        bet_amount = get_user_response.to_i
-        if bet_amount > @better.points_balance
-          over_bet 
-        end
-      end 
-    elsif 
-      if bet_amount > @better.points_balance
-      over_bet
-      end  
-    end 
-    new_bet = Bet.create(points_amount: bet_amount, better_id: @better.id, game_id: new_game.id)
-    new_bet.points_amount = bet_amount
     make_bet
-    divider
-    puts "Heads or Tails?"
-    user_guess = get_user_response
-    divider
-    puts "Flipping the coin!"
-    divider
-    sleep(1)
-    if user_guess == game_result
-      @better.points_balance += bet_amount
-      @better.save
-      sleep(1)
-      puts "IT'S #{game_result.upcase}!! CONGRATULATIONS YOU WIN!!"
-    else 
-      @better.points_balance -= bet_amount
-      @better.save
-      sleep(1)
-      puts "It's #{game_result.capitalize}. :( Better luck next time!"
-    end
-    sleep(1.5)
-    divider
-    double_or_nothing
+    heads_or_tails_method
+    end 
   end 
 
   def bet_again
@@ -175,31 +140,68 @@ class CLI
     end
   end 
 
-  def double_or_nothing
-    puts "Double or nothing?"
-    puts "1. Hell yeah"
-    puts "2. Naw I'm good"
-    option_picked = get_user_response
-    if option_picked == "1"
-      play_game((Bet.last.points_amount) * 2)
-    elsif option_picked == "2"
-      return self.main_menu
-    end
+  def wait_for_user_to_read
+    puts "Enter anything to return to the main menu"
+    if get_user_response
+    return self.main_menu
+    end 
   end
 
-  # def make_bet
-  #   new_bet = Bet.create(points_amount: @bet_amount, better_id: @better.id, game_id: new_game.id)
-  #   new_bet.points_amount = @bet_amount
-  # end 
+  def make_game
+    @new_game = Game.create
+    @game_result = @new_game.result
+    @new_game.outcome = @game_result
+    @new_game.save
+  end 
 
+  def make_bet
+    new_bet = Bet.create(points_amount: @bet_amount, better_id: @better.id, game_id: @new_game.id)
+    new_bet.points_amount = @bet_amount
+    new_bet
+  end 
 
+  def heads_or_tails_method
+    divider
+    puts "Heads or Tails?"
+    user_guess = get_user_response
+    divider
+    puts "Flipping the coin!"
+    divider
+    sleep(1)
+    if user_guess == @game_result
+      @better.points_balance += @bet_amount.to_i
+      @better.save
+      sleep(1)
+      puts "IT'S #{@game_result.upcase}!! CONGRATULATIONS YOU WIN!!"
+    else 
+      @better.points_balance -= @bet_amount
+      @better.save
+      sleep(1)
+      puts "It's #{@game_result.capitalize}. :( Better luck next time!"
+    end
+    sleep(1.5)
+    divider
+    bet_again
+  end
+
+  def scrounge_for_points
+    if @better.points_balance > 0
+       puts "Sorry, this option is only for the truly desperate"
+       sleep(1.5)
+       wait_for_user_to_read
+    else 
+      @better.points_balance += 100
+      puts "Have some points, it looks like you need them"
+      divider
+      wait_for_user_to_read
+    end
+  end
 
   def over_bet
     puts ""
       puts "Exceeded limit on bet amount. Please bet within your limit."
       sleep(2)
-      play_game
-      divider
+      return self.main_menu
   end
 
   def error_message
@@ -213,3 +215,4 @@ class CLI
     gets.strip.downcase
   end
 end 
+ 
