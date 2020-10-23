@@ -2,9 +2,6 @@ require 'pry'
 
 class CLI
   def initialize
-    # Bet.destroy_all
-    # Better.destroy_all
-    # Game.destroy_all
     @better = nil
     @bet_amount = nil
     @game_result = nil
