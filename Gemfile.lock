@@ -13,6 +13,7 @@ GEM
       tzinfo (~> 1.1)
       zeitwerk (~> 2.2, >= 2.2.2)
     coderay (1.1.3)
+    colorize (0.8.1)
     concurrent-ruby (1.1.7)
     database_cleaner (1.8.5)
     i18n (1.8.5)
@@ -50,6 +51,7 @@ PLATFORMS
 
 DEPENDENCIES
   activerecord
+  colorize
   database_cleaner
   pry
   rake

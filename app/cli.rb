@@ -14,16 +14,26 @@ class CLI
   def main_menu
     if @better == nil
      2.times {divider}
-      puts "Welcome to Coin Collector!"
+      puts "
+
+█████████████████████████████████████████████████████████████
+█▄─█▀▀▀█─▄█▄─▄▄─█▄─▄███─▄▄▄─█─▄▄─█▄─▀█▀─▄█▄─▄▄─███─▄─▄─█─▄▄─█
+██─█─█─█─███─▄█▀██─██▀█─███▀█─██─██─█▄█─███─▄█▀█████─███─██─█
+▀▀▄▄▄▀▄▄▄▀▀▄▄▄▄▄▀▄▄▄▄▄▀▄▄▄▄▄▀▄▄▄▄▀▄▄▄▀▄▄▄▀▄▄▄▄▄▀▀▀▀▄▄▄▀▀▄▄▄▄▀
+██████████████████████████████████████████████████████████████████████████████
+█─▄▄▄─█─▄▄─█▄─▄█▄─▀█▄─▄███─▄▄▄─█─▄▄─█▄─▄███▄─▄███▄─▄▄─█─▄▄▄─█─▄─▄─█─▄▄─█▄─▄▄▀█
+█─███▀█─██─██─███─█▄▀─████─███▀█─██─██─██▀██─██▀██─▄█▀█─███▀███─███─██─██─▄─▄█
+▀▄▄▄▄▄▀▄▄▄▄▀▄▄▄▀▄▄▄▀▀▄▄▀▀▀▄▄▄▄▄▀▄▄▄▄▀▄▄▄▄▄▀▄▄▄▄▄▀▄▄▄▄▄▀▄▄▄▄▄▀▀▄▄▄▀▀▄▄▄▄▀▄▄▀▄▄▀".colorize(:green)
       puts ""
       puts "What is your name?"
-      2.times {divider}
+      # divider
       name = get_user_response
       @better = create_better(name)
     end
     divider
-    puts "Hi, #{@better.username.capitalize}!"
+    puts "Hi, #{@better.username.capitalize.colorize(:light_blue)}!"
     puts "You pick what to do next:"
+    sleep(0.5)
     divider
     puts "1. Change username"
     puts "2. Check coin balance"
@@ -65,7 +75,7 @@ class CLI
     @better.username = new_name
     divider
     @better.save
-    puts "#{new_name.capitalize}, what a kickass name!"
+    puts "#{new_name.capitalize.colorize(:light_blue)}, what a kickass name!"
     divider
     sleep(1.5)
     return self.main_menu
@@ -78,7 +88,7 @@ class CLI
   end
 
   def check_points_balance
-    puts "Your current coin-count is #{@better.points_balance} coins."
+    puts "Your current coin-count is #{@better.points_balance.to_s.colorize(:yellow)} coins."
     sleep(1.5)
     wait_for_user_to_read
   end
@@ -89,11 +99,10 @@ class CLI
       divider
       sleep(2)
       return self.main_menu
-
     else
       make_game
       divider 
-      puts "How much would you like to bet? You have #{@better.points_balance} coins left"
+      puts "How much would you like to bet? You have #{@better.points_balance.to_s.colorize(:yellow)} coins left"
         comparer = get_user_response 
         if comparer.to_i > @better.points_balance.to_i
           overbet
@@ -129,7 +138,7 @@ class CLI
     option_picked = get_user_response
     if option_picked == "1"
       divider
-      puts "Goodbye #{@better.username.capitalize}! Don't go spending all those coins in one place!"
+      puts "Goodbye #{@better.username.capitalize.colorize(:light_blue)}! Don't go spending all those coins in one place!"
       divider
       Better.delete(@better.id)
     elsif option_picked == "2"
@@ -141,7 +150,7 @@ class CLI
   end 
 
   def wait_for_user_to_read
-    puts "Enter anything to return to the main menu"
+    puts "Enter anything to return to the main menu".colorize(:green)
     if get_user_response
     return self.main_menu
     end 
@@ -172,12 +181,12 @@ class CLI
       @better.points_balance += @bet_amount.to_i
       @better.save
       sleep(1)
-      puts "IT'S #{@game_result.upcase}!! CONGRATULATIONS YOU WIN!!"
+      puts "IT'S #{@game_result.upcase}!! CONGRATULATIONS, YOU WIN!!".colorize(:green)
     else 
       @better.points_balance -= @bet_amount
       @better.save
       sleep(1)
-      puts "It's #{@game_result.capitalize}. :( Better luck next time!"
+      puts "It's #{@game_result.capitalize}. :( Better luck next time!".colorize(:red)
     end
     sleep(1.5)
     divider
