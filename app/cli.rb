@@ -193,14 +193,14 @@ class CLI
     bet_again
   end
 
-  def scrounge_for_points
+  def scrounge_for_coins
     if @better.points_balance > 0
        puts "Sorry, this option is only for the truly desperate"
        sleep(1.5)
        wait_for_user_to_read
     else 
       @better.points_balance += 100
-      puts "Have some points, it looks like you need them"
+      puts "Have some coins, it looks like you need them"
       divider
       wait_for_user_to_read
     end
